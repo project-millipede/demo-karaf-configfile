@@ -75,6 +75,8 @@
     </dependencyManagement>
 
     <modules>
+        <module>demo-component</module>
+        <module>demo-feature</module>
         <module>demo-distribution</module>
     </modules>
 
