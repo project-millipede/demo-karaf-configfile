@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  demo:
+    image: registry.gitlab.com/m_gri/demo-karaf-configfile:1.0.0
+    container_name: demo-karaf-configfile
+    command: ["karaf", "run"]

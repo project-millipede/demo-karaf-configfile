@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.millipede</groupId>
+        <artifactId>demo-karaf-configfile</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>demo-karaf-configfile-distribution</artifactId>
+
+    <packaging>karaf-assembly</packaging>
+
+    <name>Demo :: Karaf :: Configfile :: Distribution</name>
+
+    <description>Assembly of application artifacts, distributed in a docker image.</description>
+
+    <properties>
+        <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
+
+        <!-- Docker Settings -->
+        <!--suppress UnresolvedMavenProperty -->
+        <registry-push-url>${env.REGISTRY_PUSH_URL}</registry-push-url>
+        <!--suppress UnresolvedMavenProperty -->
+        <registry-push-project-path>${env.REGISTRY_PUSH_PROJECT_PATH}</registry-push-project-path>
+        <!--suppress UnresolvedMavenProperty -->
+        <registry-pull-url>${env.REGISTRY_PULL_URL}</registry-pull-url>
+    </properties>
+
+    <dependencies>
+        <!-- Scope is compile so all features (there is only one) are installed into startup.properties.
+        The feature repo itself is not added in etc/org.apache.karaf.features.cfg file -->
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
+            <version>${karaf.version}</version>
+            <type>kar</type>
+        </dependency>
+
+        <!-- Scope is runtime so the feature repo is listed in etc/org.apache.karaf.features.cfg file.
+        The features will installed into the system directory if specify in the plugin configuration -->
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>standard</artifactId>
+            <version>${karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${docker-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <!-- default execution - assembly, archive -->
+                <!-- excluded execution - dockerfile -->
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <configuration>
+                    <config>
+                        <karaf.framework>equinox</karaf.framework>
+                    </config>
+                    <installedFeatures>
+                        <feature>wrapper</feature>
+                    </installedFeatures>
+                    <bootFeatures>
+                        <feature>minimal</feature>
+                        <feature>scr</feature>
+                    </bootFeatures>
+                    <javase>11</javase>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <!--
+                    Configuration detail for authentication is not defined here;
+                    instead, configuration detail gets tied to the maven process, referencing a settings.xml variant.
+                    The variables for both push and pull- registry correspond to server ids in settings.xml.
+                    The purpose of this separation is to serve configuration detail for authentication
+                    in an independent manner, e.g., local or CI.
+                    -->
+                    <pushRegistry>${registry-push-url}</pushRegistry>
+                    <pullRegistry>${registry-pull-url}</pullRegistry>
+                    <images>
+                        <image>
+                            <name>
+                                ${registry-push-url}/${registry-push-project-path}:${project.version}
+                            </name>
+                            <build>
+                                <dockerFileDir>.</dockerFileDir>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <assembly>
+                                    <descriptor>assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                            <goal>remove</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

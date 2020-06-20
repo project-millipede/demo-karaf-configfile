@@ -1,0 +1,43 @@
+image: maven:3.6.3-jdk-11
+
+before_script:
+  - export REGISTRY_PUSH_URL=${CI_REGISTRY}
+  - export REGISTRY_PUSH_USERNAME=${CI_REGISTRY_USER:-gitlab-ci-token}
+  - export REGISTRY_PUSH_PASSWORD=${CI_REGISTRY_PASSWORD:-${CI_JOB_TOKEN}}
+  - export REGISTRY_PUSH_PROJECT_PATH=${CI_PROJECT_PATH}
+  - export REGISTRY_PULL_URL=${REGISTRY_PULL_URL}
+  - export REGISTRY_PULL_USERNAME=${REGISTRY_PULL_USER}
+  - export REGISTRY_PULL_PASSWORD=${REGISTRY_PULL_PASSWORD}
+
+services:
+  - docker:dind
+
+variables:
+  MAVEN_CLI_OPTS: "-s settings.xml"
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_DRIVER: overlay2
+
+cache:
+  paths:
+    - ~/.m2/repository
+    - target/
+
+stages:
+  - build
+  - deploy
+
+build_feature:
+  stage: build
+  script:
+    - mvn ${MAVEN_CLI_OPTS} clean install -Ddocker.skip=true
+  except:
+    refs:
+      - master
+
+deploy_artifacts:
+  stage: deploy
+  script:
+    - mvn ${MAVEN_CLI_OPTS} clean install deploy
+  only:
+    refs:
+      - master

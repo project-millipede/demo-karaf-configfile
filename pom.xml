@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.millipede</groupId>
+    <artifactId>demo-karaf-configfile</artifactId>
+    <version>1.0.0</version>
+
+    <packaging>pom</packaging>
+
+    <name>Demo :: Karaf :: Configfile</name>
+
+    <description>Illustrates how Apache Karaf based config-file approach gets used to onboard configuration onto an
+        OSGi-based component.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <releases.repo.id>placeholder-releases.repo.id</releases.repo.id>
+        <releases.repo.url>placeholder-releases.repo.url</releases.repo.url>
+        <snapshots.repo.id>placeholder-snapshots.repo.id</snapshots.repo.id>
+        <snapshots.repo.url>placeholder-snapshots.repo.url</snapshots.repo.url>
+
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+
+        <osgi.core.version>7.0.0</osgi.core.version>
+        <osgi.cmpn.version>7.0.0</osgi.cmpn.version>
+        <slf4j.version>1.7.29</slf4j.version>
+
+        <bnd.version>5.1.0</bnd.version>
+        <maven-jar-plugin.version>3.0.1</maven-jar-plugin.version>
+
+        <karaf.version>4.3.0.RC1</karaf.version>
+        <karaf-maven-plugin.version>4.3.0.RC1</karaf-maven-plugin.version>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>${releases.repo.id}</id>
+            <url>${releases.repo.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>${snapshots.repo.id}</id>
+            <url>${snapshots.repo.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.core</artifactId>
+                <version>${osgi.core.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.cmpn</artifactId>
+                <version>${osgi.cmpn.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>demo-distribution</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.karaf.tooling</groupId>
+                    <artifactId>karaf-maven-plugin</artifactId>
+                    <version>${karaf-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
